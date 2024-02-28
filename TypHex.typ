@@ -59,18 +59,20 @@
       dir:ttb,
       spacing: none,
       table( // Use grid ?
-        stroke: none,
-        columns: (maxChars * rowNumbersSize + gridHorPadding,) + (hexagonSize,)*n,
+        stroke: black,
+        inset: (left : 0pt, right: 5pt), // This value is just tested, should rather be calculated, and this doesn't work well with left alignement (to be fixed later)
+        columns: (maxChars * rowNumbersSize + gridHorPadding,) + (hexagonSize,)*n + (hexagonSize/2 * n + maxChars * rowNumbersSize,),
         [],
-        ..letterLine
+        ..letterLine,
+        []
       ),
       v(gridVerPadding),
       ..range(n).map(i => {
+        let l = str(i+1).len();
         stack(
           dir: ltr,
           spacing: none,
           {
-            let l = str(i+1).len();
             h(hexagonSize/2 * i - (l - maxChars) * rowNumbersSize);
           },
           align(horizon, str(i+1)),
@@ -86,14 +88,18 @@
           }),
           h(gridHorPadding),
           align(horizon, str(i+1)),
+          {
+            h(hexagonSize/2 * (n -i) - (l - maxChars) * rowNumbersSize);
+          }
         )
       }),
       v(gridVerPadding),
       table( // Use grid ?
-        stroke: none,
-        columns: (maxChars * rowNumbersSize + gridHorPadding + hexagonSize/2 * (n - 1),) + (hexagonSize,)*n,
+        stroke: black,
+        columns: (hexagonSize/2 * (n -1) + maxChars * rowNumbersSize,) + (hexagonSize,)*n + (maxChars * rowNumbersSize + gridHorPadding,),
         [],
-        ..letterLine
+        ..letterLine,
+        []
       )
     )
   });
