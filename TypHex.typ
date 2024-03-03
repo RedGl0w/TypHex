@@ -71,14 +71,14 @@
   // The width of an hexagon
   let hexagonWidth = hexagonSize*calc.cos(30deg);
 
-  let g = style(styles => {
+  style(styles => {
     let rowNumbersSize = measure(text(textSize)[1], styles).width;
-    stack(
+    let g = stack(
       dir:ttb,
       spacing: -minusSpacing,
       table( // Use grid ?
         stroke: none,
-        inset: (left : 0pt, right: 0pt),
+        inset: (left : 0pt, right: 0pt, top: 2pt, bottom: 2pt),
         columns: (maxChars * rowNumbersSize,) + (gridHorPadding,) + (hexagonWidth,)*n + (hexagonWidth/2 * (n -1),) + (gridHorPadding,) + (maxChars * rowNumbersSize,),
         [], [],
         ..letterLine,
@@ -117,45 +117,61 @@
         [], []
       )
     )
-  });
+    box({
+      let d = measure(g, styles);
 
-  box(
-  style(styles => {
-    let d = measure(g, styles);
-    place(
-      polygon(
-        fill: blue,
-        (0pt, 0pt),
-        (d.width/2, d.height/2),
-        (0pt, d.height)
-      )
-    );
-    place(
-      polygon(
-        fill: red,
-        (0pt, 0pt),
-        (d.width/2, d.height/2),
-        (d.width, 0pt)
-      )
-    );
-    place(
-      polygon(
-        fill: blue,
-        (d.width/2, d.height/2),
-        (d.width, 0pt),
-        (d.width, d.height)
-      )
-    );
-    place(
-      polygon(
-        fill: red,
-        (d.width/2, d.height/2),
-        (0pt, d.height),
-        (d.width, d.height)
-      )
-    );
-    g;
-  }));
+      let textHeight = measure(text(textSize)[A], styles).height;
+      let topPadding = 4pt + textHeight - gridVerPadding - hexagonSize/2;
+      let leftPadding = maxChars * rowNumbersSize + gridHorPadding;
+      let gridWidth = n * hexagonWidth;
+      let topRight = leftPadding + gridWidth;
+      let bottomLeft = d.width - gridWidth - rowNumbersSize * maxChars - 2*gridHorPadding;
+    
+      // Left
+      place(
+        polygon(
+          fill: blue,
+          (leftPadding/2, topPadding/2),
+          (0pt, topPadding + 10pt),
+          (bottomLeft, d.height),
+          (d.width/2, d.height/2),
+        )
+      );
+
+      // Top
+      place(
+        polygon(
+          fill: red,
+          (leftPadding/2, topPadding/2),
+          (leftPadding -5pt, 0pt),
+          (topRight, 0pt),
+          (d.width/2, d.height/2)
+        )
+      );
+
+      // Right
+      place(
+        polygon(
+          fill: blue,
+          (d.width/2, d.height/2),
+          (topRight, 0pt),
+          (d.width, d.height)
+        )
+      );
+
+      // Bottom
+      place(
+        polygon(
+          fill: red,
+          (d.width/2, d.height/2),
+          (bottomLeft, d.height),
+          (d.width, d.height)
+        )
+      );
+
+      g;
+    })
+  });
 }
 
 // Decode "a1" to (0,0)
