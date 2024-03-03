@@ -38,7 +38,21 @@
   } else {
     assert(false, message: "Invalid color");
   }
-  rotate(30deg, polygon.regular(fill: c, stroke: black, size: size, vertices: 6))
+
+  // We can't use polygon.regular + rotate without 
+  let width = size*calc.cos(30deg);
+  box(width: width,
+  height: size,
+  polygon(
+    fill: c,
+    stroke: black + 1pt,
+    (0%, 25%),
+    (50%, 0%),
+    (100%, 25%),
+    (100%, 75%),
+    (50%, 100%),
+    (0%, 75%)
+  ));
 }
 
 // Will draw a grid of hex with cell occupied in g and size in n
@@ -47,34 +61,38 @@
   let gridHorPadding = 5pt;
   let gridVerPadding = 2pt;
 
+  // Fixme : shouldn't be limited to one character
   let letterLine = range(n).map(i => {
     align(center, str.from-unicode(97 + i))
   });
 
+  // The maximum number of chars of the row numbers
   let maxChars = str(n).len();
+  // Size of the "top" of an hexagon
+  let minusSpacing = hexagonSize/2 * (1 - calc.sin(30deg));
+  // The width of an hexagon
+  let hexagonWidth = hexagonSize*calc.cos(30deg);
 
   style(styles => {
     let rowNumbersSize = measure([1], styles).width;
     stack(
       dir:ttb,
-      spacing: none,
+      spacing: -minusSpacing,
       table( // Use grid ?
         stroke: none,
-        inset: (left : 0pt, right: 5pt), // This value is just tested, should rather be calculated, and this doesn't work well with left alignement (to be fixed later)
-        columns: (maxChars * rowNumbersSize + gridHorPadding,) + (hexagonSize,)*n + (hexagonSize/2 * n + maxChars * rowNumbersSize,),
-        [],
+        inset: (left : 0pt, right: 0pt),
+        columns: (maxChars * rowNumbersSize,) + (gridHorPadding,) + (hexagonWidth,)*n + (hexagonWidth/2 * (n -1),) + (gridHorPadding,) + (maxChars * rowNumbersSize,),
+        [], [],
         ..letterLine,
-        []
+        [], [], []
       ),
-      v(gridVerPadding),
+      v(minusSpacing * 2 + gridVerPadding),
       ..range(n).map(i => {
         let l = str(i+1).len();
         stack(
           dir: ltr,
           spacing: none,
-          {
-            h(hexagonSize/2 * i - (l - maxChars) * rowNumbersSize);
-          },
+          h(hexagonWidth/2 * i - (l - maxChars) * rowNumbersSize),
           align(horizon, str(i+1)),
           h(gridHorPadding),
           ..range(n).map(j => {
@@ -89,17 +107,18 @@
           h(gridHorPadding),
           align(horizon, str(i+1)),
           {
-            h(hexagonSize/2 * (n -i) - (l - maxChars) * rowNumbersSize);
+            h(hexagonWidth/2 * (n -i - 1) - (l - maxChars) * rowNumbersSize);
           }
         )
       }),
-      v(gridVerPadding),
-      table( // Use grid ?
+      v(minusSpacing * 2 + gridVerPadding),
+      table(
         stroke: none,
-        columns: (hexagonSize/2 * (n -1) + maxChars * rowNumbersSize,) + (hexagonSize,)*n + (maxChars * rowNumbersSize + gridHorPadding,),
-        [],
+        inset: (left : 0pt, right: 0pt),
+        columns: (hexagonWidth/2 * (n -1),) + (maxChars * rowNumbersSize,) + (gridHorPadding,) + (hexagonWidth,)*n + (gridHorPadding,) + (maxChars * rowNumbersSize,),
+        [], [], [],
         ..letterLine,
-        []
+        [], []
       )
     )
   });
