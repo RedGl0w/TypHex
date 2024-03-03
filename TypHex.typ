@@ -57,11 +57,11 @@
 
 // Will draw a grid of hex with cell occupied in g and size in n
 // It will draw also the labels of the columns and rows
-#let grid(g, n, hexagonSize, gridVerPadding, gridHorPadding) = {
+#let grid(g, n, hexagonSize, gridVerPadding, gridHorPadding, textSize) = {
 
   // Fixme : shouldn't be limited to one character
   let letterLine = range(n).map(i => {
-    align(center, str.from-unicode(97 + i))
+    align(center, text(textSize, str.from-unicode(65 + i)))
   });
 
   // The maximum number of chars of the row numbers
@@ -72,7 +72,7 @@
   let hexagonWidth = hexagonSize*calc.cos(30deg);
 
   style(styles => {
-    let rowNumbersSize = measure([1], styles).width;
+    let rowNumbersSize = measure(text(textSize)[1], styles).width;
     stack(
       dir:ttb,
       spacing: -minusSpacing,
@@ -91,7 +91,7 @@
           dir: ltr,
           spacing: none,
           h(hexagonWidth/2 * i - (l - maxChars) * rowNumbersSize),
-          align(horizon, str(i+1)),
+          align(horizon, text(textSize, str(i+1))),
           h(gridHorPadding),
           ..range(n).map(j => {
             let c = "e";
@@ -103,7 +103,7 @@
             hexagon(c, hexagonSize)
           }),
           h(gridHorPadding),
-          align(horizon, str(i+1)),
+          align(horizon, text(textSize, str(i+1))),
           {
             h(hexagonWidth/2 * (n -i - 1) - (l - maxChars) * rowNumbersSize);
           }
@@ -143,7 +143,7 @@
   return (row, column -1);
 }
 
-#let gridFromSGF(input, hexagonSize: 30pt, gridVerPadding : 0pt, gridHorPadding : 5pt) = {
+#let gridFromSGF(input, hexagonSize: 30pt, gridVerPadding : 0pt, gridHorPadding : 5pt, textSize : 15pt) = {
   let tree = parse(input);
   assert(tree.FF == "4", message: "Expected SGF version 4");
   let size = int(tree.SZ);
@@ -174,5 +174,5 @@
     tree = tree.children.at(0);
   }
 
-  grid(position, size, hexagonSize, gridVerPadding, gridHorPadding);
+  grid(position, size, hexagonSize, gridVerPadding, gridHorPadding, textSize);
 }
