@@ -71,7 +71,7 @@
   // The width of an hexagon
   let hexagonWidth = hexagonSize*calc.cos(30deg);
 
-  style(styles => {
+  let g = style(styles => {
     let rowNumbersSize = measure(text(textSize)[1], styles).width;
     stack(
       dir:ttb,
@@ -104,9 +104,7 @@
           }),
           h(gridHorPadding),
           align(horizon, text(textSize, str(i+1))),
-          {
-            h(hexagonWidth/2 * (n -i - 1) - (l - maxChars) * rowNumbersSize);
-          }
+          h(hexagonWidth/2 * (n -i - 1) - (l - maxChars) * rowNumbersSize)
         )
       }),
       v(minusSpacing * 2 + gridVerPadding),
@@ -120,6 +118,44 @@
       )
     )
   });
+
+  box(
+  style(styles => {
+    let d = measure(g, styles);
+    place(
+      polygon(
+        fill: blue,
+        (0pt, 0pt),
+        (d.width/2, d.height/2),
+        (0pt, d.height)
+      )
+    );
+    place(
+      polygon(
+        fill: red,
+        (0pt, 0pt),
+        (d.width/2, d.height/2),
+        (d.width, 0pt)
+      )
+    );
+    place(
+      polygon(
+        fill: blue,
+        (d.width/2, d.height/2),
+        (d.width, 0pt),
+        (d.width, d.height)
+      )
+    );
+    place(
+      polygon(
+        fill: red,
+        (d.width/2, d.height/2),
+        (0pt, d.height),
+        (d.width, d.height)
+      )
+    );
+    g;
+  }));
 }
 
 // Decode "a1" to (0,0)
