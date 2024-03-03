@@ -59,7 +59,7 @@
       dir:ttb,
       spacing: none,
       table( // Use grid ?
-        stroke: black,
+        stroke: none,
         inset: (left : 0pt, right: 5pt), // This value is just tested, should rather be calculated, and this doesn't work well with left alignement (to be fixed later)
         columns: (maxChars * rowNumbersSize + gridHorPadding,) + (hexagonSize,)*n + (hexagonSize/2 * n + maxChars * rowNumbersSize,),
         [],
@@ -95,7 +95,7 @@
       }),
       v(gridVerPadding),
       table( // Use grid ?
-        stroke: black,
+        stroke: none,
         columns: (hexagonSize/2 * (n -1) + maxChars * rowNumbersSize,) + (hexagonSize,)*n + (maxChars * rowNumbersSize + gridHorPadding,),
         [],
         ..letterLine,
