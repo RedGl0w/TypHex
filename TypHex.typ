@@ -175,7 +175,7 @@
     position += 1;
   }
 
-  let row = int(input.slice(position));
+  let row = int(input.slice(position))-1;
   return (row, column -1);
 }
 
