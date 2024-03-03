@@ -57,9 +57,7 @@
 
 // Will draw a grid of hex with cell occupied in g and size in n
 // It will draw also the labels of the columns and rows
-#let grid(g, n, hexagonSize) = {
-  let gridHorPadding = 5pt;
-  let gridVerPadding = 2pt;
+#let grid(g, n, hexagonSize, gridVerPadding, gridHorPadding) = {
 
   // Fixme : shouldn't be limited to one character
   let letterLine = range(n).map(i => {
@@ -145,7 +143,7 @@
   return (row, column -1);
 }
 
-#let gridFromSGF(input, hexagonSize: 30pt) = {
+#let gridFromSGF(input, hexagonSize: 30pt, gridVerPadding : 0pt, gridHorPadding : 5pt) = {
   let tree = parse(input);
   assert(tree.FF == "4", message: "Expected SGF version 4");
   let size = int(tree.SZ);
@@ -176,5 +174,5 @@
     tree = tree.children.at(0);
   }
 
-  grid(position, size, hexagonSize);
+  grid(position, size, hexagonSize, gridVerPadding, gridHorPadding);
 }
