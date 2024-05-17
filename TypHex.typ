@@ -26,7 +26,7 @@
 }
 
 // Simply draw an hexagon
-#let hexagon(owner, size) = {
+#let hexagon(owner, size, topColor: none, leftColor: none, rightColor: none, bottomColor: none) = {
   let c = black;
   let o = getowner(owner);
   if o == -1 {
@@ -43,16 +43,52 @@
   let width = size*calc.cos(30deg);
   box(width: width,
   height: size,
-  polygon(
-    fill: c,
-    stroke: black + 1pt,
-    (0%, 25%),
-    (50%, 0%),
-    (100%, 25%),
-    (100%, 75%),
-    (50%, 100%),
-    (0%, 75%)
-  ));
+  {
+    let top = ((0%, 25%), (50%, 0%));
+    let right = ((100%, 25%), (100%, 75%));
+    if (topColor == none) {
+      right.insert(0,(50%, 0%));
+    } else {
+      top.push((100%, 25%));
+    }
+
+    let bottom = ((50%, 100%), (100%, 75%));
+    let left = ((0%, 25%), (0%, 75%));
+    if (bottomColor == none) {
+      left.push((50%, 100%))
+    } else {
+      bottom.insert(0,(0%, 75%));
+    }
+    
+    let paintSide(arr, co) = {
+      if (co == none) {
+        co = 1.5pt + black;
+      } else {
+        co = 5pt + co;
+      }
+      let n = arr.len();
+      for i in range(0, n - 1) {
+        place(line(start: arr.at(i), end: arr.at(i+1), stroke: co));
+      }
+    }
+
+    // We don't use here a regular polygon because it mangles with rotate (the "hitboxes" aren't rotated)
+    place(polygon(
+      fill: c,
+      stroke: none,
+      (0%, 25%),
+      (50%, 0%),
+      (100%, 25%),
+      (100%, 75%),
+      (50%, 100%),
+      (0%, 75%)
+    ));
+
+    paintSide(top, topColor);
+    paintSide(left, leftColor);
+    paintSide(right, rightColor);
+    paintSide(bottom, bottomColor);
+  });
 }
 
 // Will draw a grid of hex with cell occupied in g and size in n
@@ -100,7 +136,25 @@
                 c = k;
               }
             }
-            hexagon(c, hexagonSize)
+
+            let topColor = none;
+            let bottomColor = none;
+            let leftColor = none;
+            let rightColor = none;
+            if (i == 0) { 
+              topColor = redcolor 
+            }
+            if (i == n - 1) {
+              bottomColor = redcolor
+            }
+            if (j == 0) { 
+              leftColor = bluecolor 
+            }
+            if (j == n - 1) {
+              rightColor = bluecolor
+            }
+
+            hexagon(c, hexagonSize, topColor: topColor, bottomColor: bottomColor, leftColor: leftColor,rightColor:rightColor)
           }),
           h(gridHorPadding),
           align(horizon, text(textSize, str(i+1))),
@@ -126,49 +180,6 @@
       let gridWidth = n * hexagonWidth;
       let topRight = leftPadding + gridWidth;
       let bottomLeft = d.width - gridWidth - rowNumbersSize * maxChars - 2*gridHorPadding;
-    
-      // Left
-      place(
-        polygon(
-          fill: blue,
-          (leftPadding/2, topPadding/2),
-          (0pt, topPadding + 10pt),
-          (bottomLeft, d.height),
-          (d.width/2, d.height/2),
-        )
-      );
-
-      // Top
-      place(
-        polygon(
-          fill: red,
-          (leftPadding/2, topPadding/2),
-          (leftPadding -5pt, 0pt),
-          (topRight, 0pt),
-          (d.width/2, d.height/2)
-        )
-      );
-
-      // Right
-      place(
-        polygon(
-          fill: blue,
-          (d.width/2, d.height/2),
-          (topRight, 0pt),
-          (d.width, d.height)
-        )
-      );
-
-      // Bottom
-      place(
-        polygon(
-          fill: red,
-          (d.width/2, d.height/2),
-          (bottomLeft, d.height),
-          (d.width, d.height)
-        )
-      );
-
       g;
     })
   });
